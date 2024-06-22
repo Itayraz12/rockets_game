@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="default_margin">18dp</dimen>
+    <dimen name="hearts_width">140dp</dimen>
+    <dimen name="heart_height">40dp</dimen>
+    <dimen name="row_height">90dp</dimen>
+    <dimen name="player_row_merge">60dp</dimen>
+    <dimen name="padding_rows_vertical">10dp</dimen>
+</resources>
