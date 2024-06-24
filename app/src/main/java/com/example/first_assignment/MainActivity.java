@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Game over", "You lose");
             stopTimer();
             restartGame();
-            //showGameOverCountdownDialog();
+            showGameOverCountdownDialog();
             return;
         } else {
             displayPlayerIcon();
@@ -260,40 +260,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-//    private void showGameOverCountdownDialog() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("Game Over");
-//
-//        // Create a TextView to display the countdown
-//        final TextView message = new TextView(this);
-//        message.setText("You have lost all your lives, game will restart in 3");
-//        message.setTextSize(18);
-//        message.setPadding(20, 20, 20, 20);
-//        builder.setView(message);
-//
-//        // Create the AlertDialog
-//        AlertDialog dialog = builder.create();
-//        dialog.show();
-//
-//        // Create a CountDownTimer to update the countdown text and restart the game after 3 seconds
-//        new CountDownTimer(3000, 1000) {
+    private void showGameOverCountdownDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Game Over");
 
-//            @Override
-//            public void onTick(long millisUntilFinished) {
-//                int secondsRemaining = (int) (millisUntilFinished / 1000);
-//                message.setText("You have lost all your lives, game will restart in " + secondsRemaining);
-//            }
-//
-//            @Override
-//            public void onFinish() {
-//                dialog.dismiss();
-//                // Reset the game
-//                gameManager.resetGame();
-//                refreshUI();
-//                startTimer();
-//            }
-//        }.start();
-//    }
+        // Create a TextView to display the countdown
+        final TextView message = new TextView(this);
+        message.setText("You have lost all your lives, game will restart in 3");
+        message.setTextSize(18);
+        message.setPadding(20, 20, 20, 20);
+        builder.setView(message);
+
+        // Create the AlertDialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Create a CountDownTimer to update the countdown text and restart the game after 3 seconds
+        new CountDownTimer(3000, 1000) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                int secondsRemaining = (int) (millisUntilFinished / 1000);
+                message.setText("You have lost all your lives, game will restart in " + secondsRemaining);
+            }
+
+            @Override
+            public void onFinish() {
+                dialog.dismiss();
+                // Reset the game
+                gameManager.resetGame();
+                refreshUI();
+                startTimer();
+            }
+        }.start();
+    }
 
 
     private void restartGame() {
