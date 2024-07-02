@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".homePage_activity">
+
+    <!-- Title Part -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="@color/brown_300"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/titleTextView"
+            android:layout_width="362dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="@string/game_name_string"
+            android:textColor="@color/white"
+            android:textSize="@dimen/title_size_activity"
+            android:textStyle="bold" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/formContainer"
+        android:layout_width="match_parent"
+        android:layout_height="569dp"
+        android:layout_below="@id/titleTextView"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@color/blue_grey_300"
+        android:backgroundTintMode="src_atop"
+        android:elevation="4dp"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:cardCornerRadius="8dp"
+        tools:ignore="NotSibling">
+
+        <!-- Form Part -->
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/formLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <!-- Game Speed Part -->
+
+            <!-- Movement Part -->
+
+            <RadioGroup
+                android:id="@+id/gameSpeedRadioGroup"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingEnd="8dp"
+                tools:ignore="RtlSymmetry">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/white"
+                    android:elevation="2dp"
+                    android:padding="8dp"
+                    android:paddingBottom="8dp"
+                    android:text="@string/game_speed_label_string"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/form_title_size_activity"
+                    android:textStyle="bold"
+                    app:cardCornerRadius="8dp" />
+
+                <RadioButton
+                    android:id="@+id/slowRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/radio_button_background"
+                    android:button="@drawable/radio_button_selector"
+                    android:minHeight="48dp"
+                    android:paddingStart="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp"
+                    android:text="@string/slow_option_string"
+                    android:textColor="@color/black" />
+
+                <RadioButton
+                    android:id="@+id/fastRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/radio_button_background"
+                    android:button="@drawable/radio_button_selector"
+                    android:minHeight="48dp"
+                    android:paddingStart="20dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp"
+                    android:text="@string/fast_option_string"
+                    android:textColor="@color/black" />
+
+            </RadioGroup>
+
+            <RadioGroup
+                android:id="@+id/movementRadioGroup"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingStart="8dp">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/white"
+                    android:elevation="2dp"
+                    android:padding="8dp"
+                    android:paddingBottom="8dp"
+                    android:text="@string/movement_label_string"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/form_title_size_activity"
+                    android:textStyle="bold"
+                    app:cardCornerRadius="8dp" />
+
+                <RadioButton
+                    android:id="@+id/buttonsRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/radio_button_background"
+                    android:button="@drawable/radio_button_selector"
+                    android:minHeight="48dp"
+                    android:paddingStart="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="12dp"
+                    android:text="@string/buttons_option_string"
+                    android:textColor="@color/black" />
+
+                <RadioButton
+                    android:id="@+id/sensorsRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/radio_button_background"
+                    android:button="@drawable/radio_button_selector"
+                    android:text="@string/sensors_option_string"
+                    android:textColor="@color/black"
+                    android:padding="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp" />
+
+            </RadioGroup>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <!-- Play Button Part -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/playButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/leaf_green_button"
+            app:cornerRadius="8dp"
+            android:elevation="4dp"
+            android:text="@string/play_button_string"
+            android:textColor="@color/white" />
+
+        <!-- Records Button Part -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/recordsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/midnight_button"
+            app:cornerRadius="8dp"
+            android:elevation="4dp"
+            android:text="@string/records_button_string"
+            android:textColor="@color/white" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:padding="16dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="0dp"
+            android:layout_height="@dimen/pic_width_and_height"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/ic_sinuar"
+            android:visibility="visible"
+            android:layout_marginBottom="@dimen/default_margin"
+            android:scaleType="centerInside"
+            android:elevation="2dp" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</RelativeLayout>

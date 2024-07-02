@@ -5,4 +5,22 @@
     <color name="green_300">#81C784</color>
     <color name="red_300">#E57373</color>
     <color name="purple">#8A2BE2</color>
+    <color name="blue_300">#64B5F6</color>
+    <color name="yellow_300">#FFF176</color>
+    <color name="orange_300">#FFB74D</color>
+    <color name="pink_300">#F06292</color>
+    <color name="cyan_300">#4DD0E1</color>
+    <color name="teal_300">#4DB6AC</color>
+    <color name="amber_300">#FFD54F</color>
+    <color name="brown_300">#A1887F</color>
+    <color name="blue_grey_300">#90A4AE</color>
+    <color name="leaf_green_button">#16B34F</color>
+    <color name="midnight_button">#2D2525</color>
+    <!-- Newly added colors -->
+    <color name="checked_start_color">#FF4081</color>
+    <color name="checked_end_color">#EC407A</color>
+    <color name="unchecked_color">#B0BEC5</color>
+    <color name="stroke_color">#607D8B</color>
+    <color name="checked_icon_color">#FF4081</color>
+    <color name="unchecked_icon_color">#B0BEC5</color>
 </resources>

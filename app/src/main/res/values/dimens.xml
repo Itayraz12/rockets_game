@@ -1,9 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- General dimensions -->
     <dimen name="default_margin">18dp</dimen>
     <dimen name="hearts_width">140dp</dimen>
     <dimen name="heart_height">40dp</dimen>
-    <dimen name="row_height">90dp</dimen>
+
     <dimen name="player_row_merge">60dp</dimen>
-    <dimen name="padding_rows_vertical">10dp</dimen>
+
+
+    <!-- Title dimensions -->
+    <dimen name="title_size_activity">24sp</dimen>
+    <dimen name="title_padding_activity">16dp</dimen>
+    <dimen name="title_margin_bottom_activity">12dp</dimen>
+
+    <!-- Form dimensions -->
+    <dimen name="form_margin_activity">16dp</dimen>
+    <dimen name="form_padding_activity">12dp</dimen>
+    <dimen name="form_title_size_activity">18sp</dimen>
+
+    <!-- Button dimensions -->
+    <dimen name="margin_top_buttons_activity">8dp</dimen>
+
+    <!-- Image dimensions -->
+    <dimen name="heart_dimention">40dp</dimen>
+    <dimen name="sides_arrows_buttons_margin">12dp</dimen>
+    <dimen name="bottom_arrows_buttons_margin">9dp</dimen>
+    <dimen name="margin_bottom_car_row">0dp</dimen>
+    <dimen name="row_height">66dp</dimen>
+    <dimen name="padding_rows_vertical">5dp</dimen>
+    <dimen name="points_size">36sp</dimen>
+    <dimen name="points_up_margin">9dp</dimen>
+    <dimen name="title_size_start_activity">42sp</dimen>
+    <dimen name="title_padding_start_activity">32dp</dimen>
+    <dimen name="title_margin_bottom_start_activity">32dp</dimen>
+    <dimen name="form_title_size_start_activity">20sp</dimen>
+    <dimen name="form_margin_start_activity">16dp</dimen>
+    <dimen name="form_padding_start_activity">16dp</dimen>
+    <dimen name="margin_top_buttons_start_activity">16dp</dimen>
+    <dimen name="pic_width_and_height">150dp</dimen>
 </resources>

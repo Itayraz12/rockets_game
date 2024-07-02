@@ -1,7 +1,19 @@
 <resources>
-    <string name="app_name">Escape from rockets</string>
+    <string name="app_name_string">Escape from rockets</string>
     <string name="play">Play</string>
     <string name="stop">Stop</string>
     <string name="left">Left</string>
     <string name="right">Right</string>
+    <string name="play_button_string">Play</string>
+    <string name="stop_button_string">Stop</string>
+    <string name="left_button_string">Left</string>
+    <string name="right_button_string">Right</string>
+    <string name="game_name_string">Escape from rockets</string>
+    <string name="game_speed_label_string">Choose game Speed</string>
+    <string name="slow_option_string">Slow</string>
+    <string name="fast_option_string">Fast</string>
+    <string name="movement_label_string">Choose Movement way</string>
+    <string name="buttons_option_string">Buttons</string>
+    <string name="sensors_option_string">Sensors</string>
+    <string name="records_button_string">Go to records page</string>
 </resources>
