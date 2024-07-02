@@ -8,26 +8,28 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- plane part -->
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/main_aircraft_container"
-        android:layout_width="200dp"
-        android:layout_height="@dimen/heart_height"
+    <!--Score part-->
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/score_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:textColor="@color/white"
+        android:textSize="34sp"
+        android:textStyle="bold"
+        android:layout_marginLeft="@dimen/default_margin"
+        android:layout_marginTop="20sp"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="@dimen/default_margin">
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/aircraft"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:scaleType="fitXY"
-            app:srcCompat="@drawable/aircraft" />
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
+        android:layout_marginRight="@dimen/default_margin"/>
 
 
     <!-- hearts part -->
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="white" />
+
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/main_container_hearts"
         android:layout_width="@dimen/hearts_width"
