@@ -3,6 +3,8 @@ package com.example.first_assignment;
 import android.Manifest;
 import android.content.Context;
 import com.google.gson.Gson;
+
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -26,6 +28,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity  {
+    private MediaPlayer mediaPlayer;
 
     private AppCompatImageView[] hearts_img;
     private AppCompatImageView[] player_icon_cells;
@@ -43,16 +46,22 @@ public class MainActivity extends AppCompatActivity  {
     public static final String NO_COLLISION = "none";
     public static final String OBSTACLE_COLLISION = "obstacle";
     public static final String GOLD_COLLISION = "gold";
+    public static final String CONTROL = "CONTROL_KEY";
+    public static final String SPEED = "SPEED_KEY";
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Initialize the MediaPlayer instance
+        mediaPlayer = MediaPlayer.create(this, R.raw.hit_sound);
+
         findViews();
         gameManager = new GameManager(rockets_mat.length, rockets_mat[0].length);
         initViews();
-
     }
 
     @Override
@@ -75,6 +84,15 @@ public class MainActivity extends AppCompatActivity  {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Release the MediaPlayer when the activity is destroyed
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
 
 
     private void findViews() {
@@ -201,13 +219,19 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     private void updateHeartsUI() {
-        boolean isCrushDetected =  gameManager.detectCollisionAndAdjustStats();
-        if (isCrushDetected == true) {
-            // add sound play
+        boolean isCrushDetected = gameManager.detectCollisionAndAdjustStats();
+        if (isCrushDetected) {
+            // Play the hit sound
+            if (mediaPlayer != null) {
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.seekTo(0);
+                } else {
+                    mediaPlayer.start();
+                }
+            }
+
             toastAndVibrate("Hit detected! " + gameManager.getHits_count());
             hearts_img[gameManager.getHits_count() - 1].setVisibility(View.INVISIBLE);
-            // add sound stop
-
         }
     }
 
