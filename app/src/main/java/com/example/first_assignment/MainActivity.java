@@ -4,6 +4,12 @@ import android.Manifest;
 import android.content.Context;
 import com.google.gson.Gson;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,10 +30,18 @@ import androidx.core.content.ContextCompat;
 import com.example.first_assignment.buisnessLogic.GameManager;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textview.MaterialTextView;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity  {
+
+    private ArrayList<Record> recordsList;
     private MediaPlayer mediaPlayer;
 
     private AppCompatImageView[] hearts_img;
@@ -49,6 +63,12 @@ public class MainActivity extends AppCompatActivity  {
     public static final String CONTROL = "CONTROL_KEY";
     public static final String SPEED = "SPEED_KEY";
 
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private SensorEventListener sensorEventListener;
+    private Toast currentToast;
+    private RecordManager recordManager;
+
 
 
     @Override
@@ -56,12 +76,44 @@ public class MainActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         // Initialize the MediaPlayer instance
         mediaPlayer = MediaPlayer.create(this, R.raw.hit_sound);
 
         findViews();
         gameManager = new GameManager(rockets_mat.length, rockets_mat[0].length);
+        recordManager = new RecordManager(this);
+
+        // Retrieve the selected options from the Intent
+        Intent intent = getIntent();
+        String speedSelection = intent.getStringExtra(SPEED);
+        String controlSelection = intent.getStringExtra(CONTROL);
+
+        // Configure the game settings based on the retrieved options
+        configureGameSettings(speedSelection, controlSelection);
+
+        // Load existing records
+        recordsList = loadRecords();
+
         initViews();
+    }
+
+    private void configureGameSettings(String speedSelection, String controlSelection) {
+        if (speedSelection != null) {
+            if (speedSelection.equals(getString(R.string.slow_option_string))) {
+                gameManager.setSpeed(GameManager.SLOW_SPEED);
+            } else if (speedSelection.equals(getString(R.string.fast_option_string))) {
+                gameManager.setSpeed(GameManager.FAST_SPEED);
+            }
+        }
+
+        if (controlSelection != null) {
+            if (controlSelection.equals(getString(R.string.buttons_option_string))) {
+                enableButtonControls();
+            } else if (controlSelection.equals(getString(R.string.sensors_option_string))) {
+                enableSensorControls();
+            }
+        }
     }
 
     @Override
@@ -74,15 +126,22 @@ public class MainActivity extends AppCompatActivity  {
     protected void onResume() {
         super.onResume();
         startTimer();
-
+        // Register sensor listener if sensors are enabled
+        if (sensorEventListener != null) {
+            sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         stopTimer();
-
+        // Unregister sensor listener to save battery
+        if (sensorEventListener != null) {
+            sensorManager.unregisterListener(sensorEventListener);
+        }
     }
+
 
     @Override
     protected void onDestroy() {
@@ -197,11 +256,25 @@ public class MainActivity extends AppCompatActivity  {
     private void refreshUI() {
         //checking if the game is over
         if (gameManager.isOutOfLife()) {
-            Log.d("Game over", "You lose");
             stopTimer();
-            insert_record();
-            //restartGame();
-            //showGameOverCountdownDialog();
+
+            // Create a new record
+            Record newRecord = new Record(gameManager.getScore(), 0.0, 0.0);
+
+            // Add the record to the list
+            recordsList.add(newRecord);
+            // Save records to storage
+            recordManager.saveRecords(recordsList);
+            // Sort records based on score
+            Collections.sort(recordsList, (r1, r2) -> r2.getPoints() - r1.getPoints());
+            // Find the rank of the current record
+            int rank = recordsList.indexOf(newRecord) + 1;
+            // Navigate to RecordsActivity and pass rank and recent score
+            Intent intent = new Intent(this, RecordsActivity.class);
+            intent.putExtra("rank", rank);
+            intent.putExtra(RecordsActivity.EXTRA_RECENT_SCORE, String.valueOf(gameManager.getScore()));
+            startActivity(intent);
+            finish(); // Finish current activity to prevent coming back with back button
             return;
         } else {
             displayPlayerIcon();
@@ -215,7 +288,7 @@ public class MainActivity extends AppCompatActivity  {
 
     private void insert_record() {
         Gson gson = new Gson();
-        //Add here logic
+
     }
 
     private void updateHeartsUI() {
@@ -291,11 +364,16 @@ public class MainActivity extends AppCompatActivity  {
 
     private void toastAndVibrate(String text) {
         vibrate();
-        toast(text);
+        showToast(text);
     }
 
-    private void toast(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    private void showToast(String message) {
+        // Cancel the previous toast if it is still visible
+        if (currentToast != null) {
+            currentToast.cancel();
+        }
+        currentToast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+        currentToast.show();
     }
 
     private void vibrate() {
@@ -343,7 +421,7 @@ public class MainActivity extends AppCompatActivity  {
             gameManager.scoreTimeIncrease();
         }
 
-                gameManager.scoreGoldIncrease();
+        gameManager.scoreGoldIncrease();
         score_label.setText(String.valueOf(gameManager.getScore()));
     }
 
@@ -360,6 +438,96 @@ public class MainActivity extends AppCompatActivity  {
         displayPlayerIcon();
         updateMatrixUI();
         startTimer();
+    }
+
+    private void enableButtonControls() {
+        ExtendedFloatingActionButton buttonLeft = findViewById(R.id.button_left);
+        ExtendedFloatingActionButton buttonRight = findViewById(R.id.button_right);
+
+        buttonLeft.setVisibility(View.VISIBLE);
+        buttonRight.setVisibility(View.VISIBLE);
+
+        buttonLeft.setOnClickListener(v -> change_player_position("left"));
+        buttonRight.setOnClickListener(v -> change_player_position("right"));
+
+        stopSensorControls();
+    }
+
+
+    private void enableSensorControls() {
+        // Hide button controls
+        findViewById(R.id.button_left).setVisibility(View.GONE);
+        findViewById(R.id.button_right).setVisibility(View.GONE);
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        sensorEventListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                float x = event.values[0];
+                // Adjust the sensitivity as needed
+                if (x > 1) {
+                    change_player_position("left");
+                } else if (x < -1) {
+                    change_player_position("right");
+                }
+            }
+
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+                // You can handle changes in sensor accuracy if needed
+            }
+        };
+
+        // Register the listener with the sensor manager
+        sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    private void stopSensorControls() {
+        if (sensorManager != null && sensorEventListener != null) {
+            sensorManager.unregisterListener(sensorEventListener);
+        }
+    }
+
+    // Call this method when the game ends
+    private void onGameEnd(int points, double latitude, double longitude) {
+        Record newRecord = new Record(points, latitude, longitude);
+        recordsList.add(newRecord);
+        Collections.sort(recordsList, (r1, r2) -> r2.getPoints() - r1.getPoints());
+
+        // Save the updated records list
+        //saveRecords(recordsList);
+
+        // Calculate rank
+        int rank = recordsList.indexOf(newRecord) + 1;
+
+        // Pass rank to RecordsActivity
+        Intent intent = new Intent(this, RecordsActivity.class);
+        intent.putExtra("rank", rank);
+        startActivity(intent);
+    }
+
+    private void saveRecords(List<Record> records) {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(records);
+        editor.putString("recordList", json);
+        editor.apply();
+    }
+
+    private ArrayList<Record> loadRecords() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("recordList", null);
+        Type type = new TypeToken<ArrayList<Record>>() {}.getType();
+        ArrayList<Record> records = gson.fromJson(json, type);
+        if (records == null) {
+            records = new ArrayList<>();
+        }
+        return records;
     }
 
 

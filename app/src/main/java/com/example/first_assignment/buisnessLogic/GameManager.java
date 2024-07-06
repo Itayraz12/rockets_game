@@ -8,6 +8,9 @@ import static com.example.first_assignment.MainActivity.OBSTACLE_COLLISION;
 public class GameManager {
 
     // Constants for initial game settings
+
+    public static final int SLOW_SPEED = 1000;
+    public static final int FAST_SPEED = 500;
     private static final int INITIAL_LIVES = 3;
     private static final int INITIAL_HITS_COUNT = 0;
     private static final int INITIAL_SCORE = 0;
@@ -18,10 +21,18 @@ public class GameManager {
     public static final String NO_COLLISION = "none";
     public static final String OBSTACLE_COLLISION = "obstacle";
     public static final String GOLD_COLLISION = "gold";
-
+    private int speed;
     private int live;
     private int score = 0;
     private int hits_count = 0;
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
 
     public String getCoin() {
         return GOLD;

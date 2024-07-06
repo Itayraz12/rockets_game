@@ -16,11 +16,15 @@
     <color name="blue_grey_300">#90A4AE</color>
     <color name="leaf_green_button">#16B34F</color>
     <color name="midnight_button">#2D2525</color>
-    <!-- Newly added colors -->
     <color name="checked_start_color">#FF4081</color>
     <color name="checked_end_color">#EC407A</color>
     <color name="unchecked_color">#B0BEC5</color>
     <color name="stroke_color">#607D8B</color>
     <color name="checked_icon_color">#FF4081</color>
     <color name="unchecked_icon_color">#B0BEC5</color>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="light_blue_200">#FFBB86FC</color>
+    <color name="light_blue_100">#FFBB86FC</color>
 </resources>

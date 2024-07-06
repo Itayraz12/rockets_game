@@ -16,4 +16,9 @@
     <string name="buttons_option_string">Buttons</string>
     <string name="sensors_option_string">Sensors</string>
     <string name="records_button_string">Go to records page</string>
+    <string name="recent_score_text">Recent score: %1$s</string>
+    <string name="records_activity_title">Records</string>
+    <string name="records_list_title">Top Scores</string>
+    <string name="back_button_text">Back</string>
+
 </resources>
