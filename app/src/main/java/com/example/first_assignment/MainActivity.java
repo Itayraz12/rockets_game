@@ -3,7 +3,12 @@ package com.example.first_assignment;
 import android.Manifest;
 import android.content.Context;
 import com.google.gson.Gson;
-
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import androidx.core.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
+import android.content.pm.PackageManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -39,7 +44,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity  implements LocationListener {
 
     private ArrayList<Record> recordsList;
     private MediaPlayer mediaPlayer;
@@ -69,12 +74,30 @@ public class MainActivity extends AppCompatActivity  {
     private Toast currentToast;
     private RecordManager recordManager;
 
+    private LocationManager locationManager;
+    private double currentLatitude;
+    private double currentLongitude;
+
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        // Initialize the LocationManager
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        // Check for location permissions
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        } else {
+            // Request location updates
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, (float) 0, (LocationListener) this);
+        }
+
 
 
         // Initialize the MediaPlayer instance
@@ -97,6 +120,28 @@ public class MainActivity extends AppCompatActivity  {
 
         initViews();
     }
+
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        currentLatitude = location.getLatitude();
+        currentLongitude = location.getLongitude();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, this);
+
+                }
+            } else {
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
     private void configureGameSettings(String speedSelection, String controlSelection) {
         if (speedSelection != null) {
@@ -150,6 +195,9 @@ public class MainActivity extends AppCompatActivity  {
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
+        }
+        if (locationManager != null) {
+            locationManager.removeUpdates(this);
         }
     }
 
@@ -259,14 +307,22 @@ public class MainActivity extends AppCompatActivity  {
             stopTimer();
 
             // Create a new record
-            Record newRecord = new Record(gameManager.getScore(), 0.0, 0.0);
+            // Create a new record with current location
+            Record newRecord = new Record(gameManager.getScore(), currentLatitude, currentLongitude);
 
             // Add the record to the list
             recordsList.add(newRecord);
+
+
+            // Sort records based on score
+            recordsList.sort((r1, r2) -> r2.getPoints() - r1.getPoints());
+
+            // Trim the list to keep only the top 5 records
+            if (recordsList.size() > 5) {
+                recordsList = new ArrayList<>(recordsList.subList(0, 5));
+            }
             // Save records to storage
             recordManager.saveRecords(recordsList);
-            // Sort records based on score
-            Collections.sort(recordsList, (r1, r2) -> r2.getPoints() - r1.getPoints());
             // Find the rank of the current record
             int rank = recordsList.indexOf(newRecord) + 1;
             // Navigate to RecordsActivity and pass rank and recent score

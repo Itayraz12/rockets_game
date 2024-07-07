@@ -57,6 +57,11 @@ public class RecordsActivity extends AppCompatActivity {
     private void loadRecordData() {
         List<Record> records = recordManager.loadRecords();
         if (records != null && !records.isEmpty()) {
+            // Ensure only the top 5 records are shown
+            if (records.size() > 5) {
+                records = new ArrayList<>(records.subList(0, 5));
+            }
+
             Log.d("RecordsActivity", "Records loaded: " + records.size());
             for (Record record : records) {
                 Log.d("RecordsActivity", record.toString());
@@ -68,6 +73,7 @@ public class RecordsActivity extends AppCompatActivity {
             showToast("No records found.");
         }
     }
+
 
     private void navigateToHomePage() {
         Intent intent = new Intent(this, homePage_activity.class);
