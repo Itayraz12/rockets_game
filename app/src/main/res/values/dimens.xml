@@ -38,4 +38,5 @@
     <dimen name="form_padding_start_activity">16dp</dimen>
     <dimen name="margin_top_buttons_start_activity">16dp</dimen>
     <dimen name="pic_width_and_height">150dp</dimen>
+    <dimen name="text_size_for_record">16sp</dimen>
 </resources>

@@ -20,5 +20,9 @@
     <string name="records_activity_title">Records</string>
     <string name="records_list_title">Top Scores</string>
     <string name="back_button_text">Back</string>
+    <string name="time_title">Time</string>
+    <string name="date_title">Date</string>
+    <string name="google_maps_api_key"></string>
+    google_maps_api_key
 
 </resources>

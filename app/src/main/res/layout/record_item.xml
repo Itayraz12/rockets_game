@@ -7,6 +7,16 @@
     android:padding="8dp">
 
     <TextView
+        android:id="@+id/user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        tools:text="user name: user" />
+
+
+    <TextView
         android:id="@+id/record_points"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -15,14 +25,6 @@
         android:textStyle="bold"
         tools:text="Points: 12345" />
 
-    <TextView
-        android:id="@+id/record_lat_lon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:textColor="@color/black"
-        tools:text="user name: " />
 
     <View
         android:layout_width="match_parent"

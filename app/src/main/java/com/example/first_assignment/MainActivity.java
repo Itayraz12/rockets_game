@@ -2,39 +2,35 @@ package com.example.first_assignment;
 
 import android.Manifest;
 import android.content.Context;
-import com.google.gson.Gson;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import androidx.core.content.ContextCompat;
-import androidx.core.app.ActivityCompat;
-import android.content.pm.PackageManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import com.example.first_assignment.buisnessLogic.GameManager;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textview.MaterialTextView;
+import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -44,7 +40,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity  implements LocationListener {
+public class MainActivity extends AppCompatActivity implements LocationListener {
 
     private ArrayList<Record> recordsList;
     private MediaPlayer mediaPlayer;
@@ -68,6 +64,8 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
     public static final String CONTROL = "CONTROL_KEY";
     public static final String SPEED = "SPEED_KEY";
 
+    public final String CHANGE_POINTS = "change_points";
+
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private SensorEventListener sensorEventListener;
@@ -78,14 +76,15 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
     private double currentLatitude;
     private double currentLongitude;
 
+    private static final float SENSITIVITY_THRESHOLD = 4.0f; // Increased the threshold value
 
-
+    private long lastSensorUpdateTime = 0;
+    private static final long SENSOR_UPDATE_INTERVAL = 500; // 500 milliseconds debounce interval
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         // Initialize the LocationManager
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -95,10 +94,8 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         } else {
             // Request location updates
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, (float) 0, (LocationListener) this);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, this);
         }
-
-
 
         // Initialize the MediaPlayer instance
         mediaPlayer = MediaPlayer.create(this, R.raw.hit_sound);
@@ -134,14 +131,12 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, this);
-
                 }
             } else {
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
             }
         }
     }
-
 
     private void configureGameSettings(String speedSelection, String controlSelection) {
         if (speedSelection != null) {
@@ -187,7 +182,6 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
         }
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -201,12 +195,9 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
         }
     }
 
-
     private void findViews() {
-
-
         //score view
-        score_label =findViewById(R.id.score_label);
+        score_label = findViewById(R.id.score_label);
 
         //hearts part
         hearts_img = new AppCompatImageView[]{
@@ -274,9 +265,6 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
                 findViewById(R.id.player_right),
                 findViewById(R.id.player_rightmost)
         };
-
-
-
     }
 
     private void initViews() {
@@ -298,21 +286,26 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
 
     private void change_player_position(String player_direction) {
         gameManager.movePlayerIcon(player_direction);
-        refreshUI();
+        refreshUI("other");
     }
 
-    private void refreshUI() {
-        //checking if the game is over
+    private void refreshUI(String reason) {
+        // Checking if the game is over
         if (gameManager.isOutOfLife()) {
             stopTimer();
 
-            // Create a new record
+            // Ensure current latitude and longitude are up-to-date
+            updateCurrentLocation();
+
             // Create a new record with current location
-            Record newRecord = new Record(gameManager.getScore(), currentLatitude, currentLongitude);
+            Record newRecord = new Record(gameManager.getUserName(), gameManager.getScore(), currentLatitude, currentLongitude);
+            Log.d("Record", newRecord.toString());
 
-            // Add the record to the list
+            // Load existing records
+            recordsList = recordManager.loadRecords();
+
+            // Add the new record to the list
             recordsList.add(newRecord);
-
 
             // Sort records based on score
             recordsList.sort((r1, r2) -> r2.getPoints() - r1.getPoints());
@@ -321,34 +314,43 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
             if (recordsList.size() > 5) {
                 recordsList = new ArrayList<>(recordsList.subList(0, 5));
             }
+
             // Save records to storage
             recordManager.saveRecords(recordsList);
+
             // Find the rank of the current record
             int rank = recordsList.indexOf(newRecord) + 1;
+
             // Navigate to RecordsActivity and pass rank and recent score
             Intent intent = new Intent(this, RecordsActivity.class);
             intent.putExtra("rank", rank);
             intent.putExtra(RecordsActivity.EXTRA_RECENT_SCORE, String.valueOf(gameManager.getScore()));
             startActivity(intent);
-            finish(); // Finish current activity to prevent coming back with back button
-            return;
+            finish(); // Finish current activity to prevent coming back with the back button
         } else {
             displayPlayerIcon();
             updateMatrixUI();
-            //check for collisions every refresh
-            //String collisionType = gameManager.detectCollisionAndAdjustStats();
+            // Check for collisions every refresh
             updateHeartsUI();
-            updateScore(DEFAULT_REASON);
+            if (reason.equals(CHANGE_POINTS)) {
+                updateScore(DEFAULT_REASON);
+            }
         }
     }
 
-    private void insert_record() {
-        Gson gson = new Gson();
-
+    private void updateCurrentLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (lastKnownLocation != null) {
+                currentLatitude = lastKnownLocation.getLatitude();
+                currentLongitude = lastKnownLocation.getLongitude();
+            }
+        }
     }
 
     private void updateHeartsUI() {
         boolean isCrushDetected = gameManager.detectCollisionAndAdjustStats();
+        Log.d("Collision Detection", "Collision detected: " + isCrushDetected);
         if (isCrushDetected) {
             // Play the hit sound
             if (mediaPlayer != null) {
@@ -373,7 +375,7 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
                 } else if (curreCol.equals(gameManager.getObstacle())) {
                     rockets_mat[i][j].setImageResource(R.drawable.ic_rocket);
                     rockets_mat[i][j].setVisibility(View.VISIBLE);
-                }else if (curreCol.equals(gameManager.getGOLD())) {
+                } else if (curreCol.equals(gameManager.getGOLD())) {
                     rockets_mat[i][j].setImageResource(R.drawable.money);
                     rockets_mat[i][j].setVisibility(View.VISIBLE);
                 }
@@ -394,7 +396,7 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
 
     private void changeMatrixTime() {
         gameManager.matrixChangePeriod();
-        refreshUI();
+        refreshUI(CHANGE_POINTS);
     }
 
     private void startTimer() {
@@ -441,61 +443,6 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
         }
     }
 
-    private void showGameOverCountdownDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Game Over");
-
-        final TextView message = new TextView(this);
-        message.setText("You have lost all your lives, game will restart in 3");
-        message.setTextSize(18);
-        message.setPadding(20, 20, 20, 20);
-        builder.setView(message);
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-        new CountDownTimer(3000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                int secondsRemaining = (int) (millisUntilFinished / 1000);
-                message.setText("You have lost all your lives, game will restart in " + secondsRemaining);
-            }
-
-            @Override
-            public void onFinish() {
-                dialog.dismiss();
-                gameManager.resetGame();
-                refreshUI();
-                startTimer();
-            }
-        }.start();
-    }
-
-    private void updateScore(String collisionType) {
-        if (collisionType.equals(GameManager.NO_COLLISION) ||
-                collisionType.equals(DEFAULT_REASON) ) {
-            gameManager.scoreTimeIncrease();
-        }
-
-        gameManager.scoreGoldIncrease();
-        score_label.setText(String.valueOf(gameManager.getScore()));
-    }
-
-
-
-
-    private void restartGame() {
-        gameManager.resetGame();
-
-        for (AppCompatImageView heart : hearts_img) {
-            heart.setVisibility(View.VISIBLE);
-        }
-        score_label.setText(0);
-        displayPlayerIcon();
-        updateMatrixUI();
-        startTimer();
-    }
-
     private void enableButtonControls() {
         ExtendedFloatingActionButton buttonLeft = findViewById(R.id.button_left);
         ExtendedFloatingActionButton buttonRight = findViewById(R.id.button_right);
@@ -509,7 +456,6 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
         stopSensorControls();
     }
 
-
     private void enableSensorControls() {
         // Hide button controls
         findViewById(R.id.button_left).setVisibility(View.GONE);
@@ -521,15 +467,17 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
         sensorEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
-                float x = event.values[0];
-                // Adjust the sensitivity as needed
-                if (x > 1) {
-                    change_player_position("left");
-                } else if (x < -1) {
-                    change_player_position("right");
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - lastSensorUpdateTime > SENSOR_UPDATE_INTERVAL) {
+                    float x = event.values[0];
+                    if (x > SENSITIVITY_THRESHOLD) {
+                        change_player_position("left");
+                    } else if (x < -SENSITIVITY_THRESHOLD) {
+                        change_player_position("right");
+                    }
+                    lastSensorUpdateTime = currentTime;
                 }
             }
-
 
             @Override
             public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -547,22 +495,13 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
         }
     }
 
-    // Call this method when the game ends
-    private void onGameEnd(int points, double latitude, double longitude) {
-        Record newRecord = new Record(points, latitude, longitude);
-        recordsList.add(newRecord);
-        Collections.sort(recordsList, (r1, r2) -> r2.getPoints() - r1.getPoints());
+    private void updateScore(String collisionType) {
+        if (collisionType.equals(GameManager.NO_COLLISION) || collisionType.equals(DEFAULT_REASON)) {
+            gameManager.scoreTimeIncrease();
+        }
 
-        // Save the updated records list
-        //saveRecords(recordsList);
-
-        // Calculate rank
-        int rank = recordsList.indexOf(newRecord) + 1;
-
-        // Pass rank to RecordsActivity
-        Intent intent = new Intent(this, RecordsActivity.class);
-        intent.putExtra("rank", rank);
-        startActivity(intent);
+        gameManager.scoreGoldIncrease();
+        score_label.setText(String.valueOf(gameManager.getScore()));
     }
 
     private void saveRecords(List<Record> records) {
@@ -585,6 +524,4 @@ public class MainActivity extends AppCompatActivity  implements LocationListener
         }
         return records;
     }
-
-
 }

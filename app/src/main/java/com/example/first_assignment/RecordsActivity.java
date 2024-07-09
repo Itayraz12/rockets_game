@@ -8,14 +8,23 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecordsActivity extends AppCompatActivity {
+public class RecordsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private ListView recordsListView;
     private MaterialButton backButton;
     private TextView recentScoreTextView;
@@ -23,6 +32,11 @@ public class RecordsActivity extends AppCompatActivity {
 
     public static final String EXTRA_RECENT_SCORE = "EXTRA_RECENT_SCORE";
     private RecordManager recordManager;
+    private GoogleMap googleMap;
+
+    private static final LatLng DEFAULT_LOCATION = new LatLng(32.1151332652287, 34.81798588795976);
+
+    private Record pendingRecord;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +47,14 @@ public class RecordsActivity extends AppCompatActivity {
         recordManager = new RecordManager(this); // Ensure RecordManager is initialized here
         loadRecordData();
         displayRecentScore();
+
+        // Initialize the map
+        SupportMapFragment mapFragment = SupportMapFragment.newInstance();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.map_container, mapFragment);
+        fragmentTransaction.commit();
+        mapFragment.getMapAsync(this);
     }
 
     private void displayRecentScore() {
@@ -57,9 +79,11 @@ public class RecordsActivity extends AppCompatActivity {
     private void loadRecordData() {
         List<Record> records = recordManager.loadRecords();
         if (records != null && !records.isEmpty()) {
-            // Ensure only the top 5 records are shown
+            // Trim the list to keep only the top 5 records
             if (records.size() > 5) {
                 records = new ArrayList<>(records.subList(0, 5));
+                // Save the trimmed list back to storage
+                recordManager.saveRecords(records);
             }
 
             Log.d("RecordsActivity", "Records loaded: " + records.size());
@@ -68,12 +92,21 @@ public class RecordsActivity extends AppCompatActivity {
             }
             adapter = new RecordsAdapter(this, new ArrayList<>(records));
             recordsListView.setAdapter(adapter);
+
+            recordsListView.setOnItemClickListener((parent, view, position, id) -> {
+                Record selectedRecord = (Record) parent.getItemAtPosition(position);
+                if (googleMap != null) {
+                    updateMap(selectedRecord);
+                } else {
+                    pendingRecord = selectedRecord;
+                    Log.d("RecordsActivity", "GoogleMap is not ready yet. Record stored for later update.");
+                }
+            });
         } else {
             Log.d("RecordsActivity", "No records found.");
-            showToast("No records found.");
+            showToast();
         }
     }
-
 
     private void navigateToHomePage() {
         Intent intent = new Intent(this, homePage_activity.class);
@@ -81,7 +114,33 @@ public class RecordsActivity extends AppCompatActivity {
         finish();
     }
 
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    private void showToast() {
+        Toast.makeText(this, "No records found.", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onMapReady(@NonNull GoogleMap map) {
+        googleMap = map;
+        // Set default location
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 15));
+        googleMap.addMarker(new MarkerOptions().position(DEFAULT_LOCATION).title("Default Location"));
+
+        // Update the map with the pending record if there is one
+        if (pendingRecord != null) {
+            updateMap(pendingRecord);
+            pendingRecord = null;
+        }
+    }
+
+    private void updateMap(Record record) {
+        if (googleMap != null) {
+            LatLng recordLocation = new LatLng(record.getLatitude(), record.getLongitude());
+            Log.d("RecordsActivity", "Updating map with record location: " + recordLocation.toString());
+            googleMap.clear();
+            googleMap.addMarker(new MarkerOptions().position(recordLocation).title("Record Location"));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(recordLocation, 15));
+        } else {
+            Log.d("RecordsActivity", "GoogleMap is not ready yet.");
+        }
     }
 }

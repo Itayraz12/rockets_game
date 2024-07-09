@@ -7,13 +7,15 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class Record {
+    private String userName;
     private String date;
     private String time;
     private int points;
     private double latitude;
     private double longitude;
 
-    public Record(int points, double latitude, double longitude) {
+    public Record(String user_name ,int points, double latitude, double longitude) {
+        setUserName(user_name);
         setPoints(points);
         setLatitude(latitude);
         setLongitude(longitude);
@@ -31,6 +33,22 @@ public class Record {
         LocalTime timeNow = LocalTime.now();
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         this.time = timeNow.format(timeFormatter);
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 
     private void setPoints(int points) {

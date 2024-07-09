@@ -90,6 +90,14 @@ public class GameManager {
         return score;
     }
 
+    public String getUserName() {
+        return UserName;
+    }
+
+    public void setUserName(String userName) {
+        UserName = userName;
+    }
+
     public void setScore(int score) {
         this.score = score;
     }
@@ -113,9 +121,12 @@ public class GameManager {
     private final int Cols;
     private final int Rows;
 
+    private  String UserName;
+
     //GameManager constructor
     public GameManager(int rows, int cols) {
         // Initialize game state
+        this.UserName = "Itay";
         this.Rows = rows;
         this.Cols = cols;
         this.live = INITIAL_LIVES;
