@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -30,11 +29,13 @@
             android:textStyle="bold" />
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- Welcome Message Part -->
+
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/formContainer"
-        android:layout_width="match_parent"
-        android:layout_height="569dp"
-        android:layout_below="@id/titleTextView"
+        android:layout_width="395dp"
+        android:layout_height="536dp"
+        android:layout_below="@id/welcome_message"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
@@ -54,8 +55,8 @@
             android:id="@+id/formLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
             android:orientation="horizontal">
 
             <!-- Game Speed Part -->
@@ -163,13 +164,13 @@
                     android:id="@+id/sensorsRadioButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
                     android:background="@drawable/radio_button_background"
                     android:button="@drawable/radio_button_selector"
-                    android:text="@string/sensors_option_string"
-                    android:textColor="@color/black"
                     android:padding="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp" />
+                    android:text="@string/sensors_option_string"
+                    android:textColor="@color/black" />
 
             </RadioGroup>
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -182,10 +183,10 @@
             android:layout_marginTop="40dp"
             android:layout_marginBottom="8dp"
             android:backgroundTint="@color/leaf_green_button"
-            app:cornerRadius="8dp"
             android:elevation="4dp"
             android:text="@string/play_button_string"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            app:cornerRadius="8dp" />
 
         <!-- Records Button Part -->
         <com.google.android.material.button.MaterialButton
@@ -194,10 +195,27 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:backgroundTint="@color/midnight_button"
-            app:cornerRadius="8dp"
             android:elevation="4dp"
             android:text="@string/records_button_string"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            app:cornerRadius="8dp" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/welcome_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/edit_text_background"
+            android:padding="8dp"
+            android:text="Welcome!"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:ignore="NotSibling" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.appcompat.widget.LinearLayoutCompat

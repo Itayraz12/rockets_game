@@ -23,12 +23,17 @@
             android:value="@string/google_maps_api_key"/>
 
         <activity
-            android:name=".homePage_activity"
+            android:name=".UsernameActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".homePage_activity"
+            android:exported="true">
         </activity>
 
         <activity

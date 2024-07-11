@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,13 +25,19 @@ public class homePage_activity extends AppCompatActivity {
     private String speedSelection;
     private String controlSelection;
 
+    private TextView welcomeMessage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
         setupUI();
         configureListeners();
+        displayWelcomeMessage(); // Display the welcome message
+
     }
+
+
 
     private void setupUI() {
         playBtn = findViewById(R.id.playButton);
@@ -41,12 +48,21 @@ public class homePage_activity extends AppCompatActivity {
         sensorsOption = findViewById(R.id.sensorsRadioButton);
         speedGroup = findViewById(R.id.gameSpeedRadioGroup);
         movementGroup = findViewById(R.id.movementRadioGroup);
-
+        welcomeMessage = findViewById(R.id.welcome_message);
         // Set default values
         slowBtn.setChecked(true);
         speedSelection = getString(R.string.slow_option_string);
         buttonsOption.setChecked(true);
         controlSelection = getString(R.string.buttons_option_string);
+    }
+
+    private void displayWelcomeMessage() {
+        String username = getIntent().getStringExtra("username");
+        if (username != null) {
+            welcomeMessage.setText("Welcome, " + username + "!");
+        } else {
+            welcomeMessage.setText("Welcome!");
+        }
     }
 
     private void configureListeners() {
