@@ -101,13 +101,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         mediaPlayer = MediaPlayer.create(this, R.raw.hit_sound);
 
         findViews();
-        gameManager = new GameManager(rockets_mat.length, rockets_mat[0].length);
+
+        // Retrieve the username from the Intent
+        Intent intent = getIntent();
+        String username = intent.getStringExtra("username");
+        String speedSelection = intent.getStringExtra(SPEED);
+        String controlSelection = intent.getStringExtra(CONTROL);
+
+        gameManager = new GameManager(username,rockets_mat.length, rockets_mat[0].length);
         recordManager = new RecordManager(this);
 
         // Retrieve the selected options from the Intent
-        Intent intent = getIntent();
-        String speedSelection = intent.getStringExtra(SPEED);
-        String controlSelection = intent.getStringExtra(CONTROL);
+
+
 
         // Configure the game settings based on the retrieved options
         configureGameSettings(speedSelection, controlSelection);

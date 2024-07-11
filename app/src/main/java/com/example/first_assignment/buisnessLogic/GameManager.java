@@ -124,9 +124,9 @@ public class GameManager {
     private  String UserName;
 
     //GameManager constructor
-    public GameManager(int rows, int cols) {
+    public GameManager(String userName, int rows, int cols) {
         // Initialize game state
-        this.UserName = "Itay";
+        this.UserName = userName;
         this.Rows = rows;
         this.Cols = cols;
         this.live = INITIAL_LIVES;

@@ -13,7 +13,6 @@ import com.google.android.material.button.MaterialButton;
 
 public class homePage_activity extends AppCompatActivity {
 
-
     private MaterialButton playBtn;
     private MaterialButton recordsBtn;
     private RadioButton slowBtn;
@@ -26,6 +25,7 @@ public class homePage_activity extends AppCompatActivity {
     private String controlSelection;
 
     private TextView welcomeMessage;
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +34,7 @@ public class homePage_activity extends AppCompatActivity {
         setupUI();
         configureListeners();
         displayWelcomeMessage(); // Display the welcome message
-
     }
-
-
 
     private void setupUI() {
         playBtn = findViewById(R.id.playButton);
@@ -49,6 +46,7 @@ public class homePage_activity extends AppCompatActivity {
         speedGroup = findViewById(R.id.gameSpeedRadioGroup);
         movementGroup = findViewById(R.id.movementRadioGroup);
         welcomeMessage = findViewById(R.id.welcome_message);
+
         // Set default values
         slowBtn.setChecked(true);
         speedSelection = getString(R.string.slow_option_string);
@@ -57,7 +55,7 @@ public class homePage_activity extends AppCompatActivity {
     }
 
     private void displayWelcomeMessage() {
-        String username = getIntent().getStringExtra("username");
+        username = getIntent().getStringExtra("username");
         if (username != null) {
             welcomeMessage.setText("Welcome, " + username + "!");
         } else {
@@ -87,11 +85,12 @@ public class homePage_activity extends AppCompatActivity {
     }
 
     private void startGameActivity() {
-        Log.d("MainActivity", "Selected Speed: " + speedSelection);
-        Log.d("MainActivity", "Selected Control: " + controlSelection);
+        Log.d("homePage_activity", "Selected Speed: " + speedSelection);
+        Log.d("homePage_activity", "Selected Control: " + controlSelection);
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(MainActivity.SPEED, speedSelection);
         intent.putExtra(MainActivity.CONTROL, controlSelection);
+        intent.putExtra("username", username); // Pass the username to MainActivity
         startActivity(intent);
         finish();
     }

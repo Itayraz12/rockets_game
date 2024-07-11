@@ -60,12 +60,10 @@ public class RecordsActivity extends AppCompatActivity implements ListFragment.O
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         ListFragment listFragment = new ListFragment();
-       //fragmentTransaction.replace(R.id.list_container, listFragment);
+
 
         mapFragment = new MapFragment();
-        //fragmentTransaction.replace(R.id.map_container, mapFragment);
 
-        //fragmentTransaction.commit();
 
         // Show fragments
         getSupportFragmentManager().beginTransaction().add(R.id.list_container, listFragment).commit();

@@ -22,7 +22,7 @@
     <string name="back_button_text">Back</string>
     <string name="time_title">Time</string>
     <string name="date_title">Date</string>
-    <string name="google_maps_api_key">key_deleted</string>
-    google_maps_api_key
+    <string name="google_maps_api_key">deleted</string>
+
 
 </resources>
